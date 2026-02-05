@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WebGL Transformations Demo</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <div class="controls">
+    <h2>Linear Transformation Demo</h2>
+    <div class="control-group">
+      <label for="transformType">Transformation Type:</label>
+      <select id="transformType">
+        <option value="translate">Translation (Move)</option>
+        <option value="rotate">Rotation</option>
+        <option value="scale">Uniform Scale</option>
+        <option value="scaleX">Scale X-axis</option>
+        <option value="scaleY">Scale Y-axis</option>
+        <option value="shear">Shear (Skew)</option>
+        <option value="reflectX">Reflect X-axis</option>
+        <option value="reflectY">Reflect Y-axis</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label for="transformSlider">Amount: <span id="sliderValue">0</span></label>
+      <input type="range" id="transformSlider" min="-100" max="100" value="0" step="1">
+    </div>
+    <div class="info">
+      <p id="transformDescription">Move the triangle left and right</p>
+    </div>
+  </div>
+  <canvas id="webgl-canvas" width="1400" height="900"></canvas>
+  <!-- Existing shader scripts -->
+  <script id="vertex-shader-2d" type="notjs">
+  attribute vec4 a_position;
+  uniform mat3 u_matrix;
+
+  void main() {
+    // Apply transformation matrix
+    vec2 position = (u_matrix * vec3(a_position.xy, 1)).xy;
+    gl_Position = vec4(position, 0, 1);
+  }
+</script>
+<script id="fragment-shader-2d" type="notjs">
+  precision mediump float;
+
+  void main() {
+    gl_FragColor = vec4(0.2, 0.6, 1.0, 1.0); // Nice blue color
+  }
+</script>
+<!--
+for most samples webgl-utils only provides shader compiling/linking and
+canvas resizing because why clutter the examples with code that's the same in every sample.
+See https://webglfundamentals.org/webgl/lessons/webgl-boilerplate.html
+and https://webglfundamentals.org/webgl/lessons/webgl-resizing-the-canvas.html
+for webgl-utils, m3, m4, and webgl-lessons-ui.
+-->
+<script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
+<script src="webgl_basic_setup.js"></script>
+</body>
+</html>
