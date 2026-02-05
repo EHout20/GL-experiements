@@ -38,11 +38,22 @@ void Shape::draw() {
 // Predefined shapes
 namespace Shapes {
     std::vector<float> Triangle() {
+        // Random colors on each load
+        float r1 = (rand() % 100) / 100.0f;
+        float g1 = (rand() % 100) / 100.0f;
+        float b1 = (rand() % 100) / 100.0f;
+        float r2 = (rand() % 100) / 100.0f;
+        float g2 = (rand() % 100) / 100.0f;
+        float b2 = (rand() % 100) / 100.0f;
+        float r3 = (rand() % 100) / 100.0f;
+        float g3 = (rand() % 100) / 100.0f;
+        float b3 = (rand() % 100) / 100.0f;
+        
         return {
-            // positions        // colors
-            -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // Red
-             0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // Green
-             0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f  // Blue
+            // positions        // colors (random)
+            -0.5f, -0.5f, 0.0f, r1, g1, b1,
+             0.5f, -0.5f, 0.0f, r2, g2, b2,
+             0.0f,  0.5f, 0.0f, r3, g3, b3
         };
     }
     
