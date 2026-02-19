@@ -1,77 +1,12 @@
 @import url("https://webglfundamentals.org/webgl/resources/webgl-tutorials.css");
-
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #1a1a1a;
-  color: white;
 }
-
 canvas {
-  display: block;
-  background: #000;
   width: 100vw;
   height: 100vh;
-}
-
-.controls {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  background: rgba(0, 0, 0, 0.8);
-  padding: 20px;
-  border-radius: 10px;
-  z-index: 100;
-  min-width: 300px;
-}
-
-.controls h2 {
-  margin-top: 0;
-  color: #4CAF50;
-}
-
-.control-group {
-  margin-bottom: 15px;
-}
-
-.control-group label {
   display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
 }
-
-.control-group select,
-.control-group input[type="range"] {
-  width: 100%;
-  padding: 5px;
-}
-
-.control-group select {
-  background: #333;
-  color: white;
-  border: 1px solid #555;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.control-group input[type="range"] {
-  cursor: pointer;
-}
-
-#sliderValue {
-  color: #4CAF50;
-  font-weight: bold;
-}
-
-.info {
-  margin-top: 15px;
-  padding-top: 15px;
-  border-top: 1px solid #444;
-}
-
-.info p {
-  margin: 5px 0;
-  color: #aaa;
-  font-size: 14px;
-  line-height: 1.4;
+#ui {
+  width: 200px;
 }
