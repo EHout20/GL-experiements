@@ -1,3 +1,4 @@
+// this is just raw coordinates
 const vertexShaderSource = `
 attribute vec4 a_position;
 
@@ -7,8 +8,3 @@ void main() {
 `;
 
 export default vertexShaderSource;
-
-
-
-
-
