@@ -1,4 +1,4 @@
-import vertexShaderSource from './shaders/vertex-pixelspace.js';
+import vertexShaderSource from './shaders/vertex-translation.js';
 // import vertexShaderSource from './shaders/vertex-clipspace.js'; // normalized coordinates
 import fragmentShaderSource from './shaders/fragment-shader.js';
 
@@ -6,8 +6,6 @@ var canvas = document.getElementById('demo-canvas');
 var gl = canvas ? canvas.getContext('webgl') : null;
 
 var translation = [0, 0];
-var width = 100;
-var height = 30;
 
 if (!gl) {
   console.error('WebGL not available on this device/browser.');
@@ -23,6 +21,7 @@ var positionAttributeLocation = gl.getAttribLocation(program, "a_position");
 var positionBuffer = gl.createBuffer();
 
 var resolutionUniformLocation = gl.getUniformLocation(program, "u_resolution");
+var translationUniformLocation = gl.getUniformLocation(program, "u_translation");
 
 gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
@@ -81,8 +80,6 @@ function setupSliders() {
   });
 }
 function drawScene() {
-  setRectangle(gl, positionBuffer, translation[0], translation[1], width, height);
-
   //clearing hte canvas
   gl.clearColor(0, 0, 0, 0);
   gl.clear(gl.COLOR_BUFFER_BIT);
@@ -91,6 +88,8 @@ function drawScene() {
   gl.useProgram(program);
   // set the resolution
   gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
+  // set the translation
+  gl.uniform2fv(translationUniformLocation, translation);
 
   //enabling the attribute on
   gl.enableVertexAttribArray(positionAttributeLocation);
@@ -109,12 +108,13 @@ function drawScene() {
 
   var primitiveType = gl.TRIANGLES;
   var offset = 0;
-  var count = 6;
+  var count = 18;
   gl.drawArrays(primitiveType, offset, count);
 }
 
 function main() {
   setupSliders();
+  setGeometry(gl);
   drawScene();
 }
 
@@ -136,6 +136,37 @@ function setRectangle(gl, buffer, x, y, width, height) {
           x1, y2,
           x2, y1,
           x2, y2,
+      ]),
+      gl.STATIC_DRAW);
+}
+
+function setGeometry(gl) {
+  gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array([
+          // left column
+          0, 0,
+          30, 0,
+          0, 150,
+          0, 150,
+          30, 0,
+          30, 150,
+ 
+          // top rung
+          30, 0,
+          100, 0,
+          30, 30,
+          30, 30,
+          100, 0,
+          100, 30,
+ 
+          // middle rung
+          30, 60,
+          67, 60,
+          30, 90,
+          30, 90,
+          67, 60,
+          67, 90,
       ]),
       gl.STATIC_DRAW);
 }
