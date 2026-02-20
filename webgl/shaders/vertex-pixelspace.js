@@ -1,10 +1,12 @@
 // this is a vertex pixelspace for unifrom clip space that uses the positiosn relative to the resolution
 // basically normalized coordinates for
 
+
 const vertexShaderSource = `
 attribute vec2 a_position;
 
 uniform vec2 u_resolution;
+uniform vec2 u_translation;
 
 void main() {
   // convert the position from pixels to 0.0 to 1.0

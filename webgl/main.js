@@ -10,13 +10,20 @@ var translation = [0, 0];
 if (!gl) {
   console.error('WebGL not available on this device/browser.');
 } else {
+/*
+  Initialization of the program and shaders, creating the buffer, and setting up the sliders for translation
 
+*/
 var vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
 var fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
 
 var program = createProgram(gl, vertexShader, fragmentShader);
 
 var positionAttributeLocation = gl.getAttribLocation(program, "a_position");
+
+var rotationLocation = gl.getUniformLocation(program, "u_rotation");
+
+var rotation = [0, 1];
 
 var positionBuffer = gl.createBuffer();
 
@@ -57,6 +64,19 @@ function createProgram(gl, vertexShader, fragmentShader) {
   gl.deleteProgram(program);
 }
 
+  // setup UI for rotation
+  webglLessonsUI.setupSlider("#x", {value: translation[0], slide: updatePosition(0), max: gl.canvas.width });
+  webglLessonsUI.setupSlider("#y", {value: translation[1], slide: updatePosition(1), max: gl.canvas.height});
+  $("#rotation").gmanUnitCircle({
+    width: 200,
+    height: 200,
+    value: 0,
+    slide: function(e,u) {
+      rotation[0] = u.x;
+      rotation[1] = u.y;
+      drawScene();
+    }
+  });
 function updatePosition(index) {
   return function(event, ui) {
     translation[index] = ui.value;
@@ -93,7 +113,8 @@ function drawScene() {
 
   //enabling the attribute on
   gl.enableVertexAttribArray(positionAttributeLocation);
-
+  // Set the rotation.
+  gl.uniform2fv(rotationLocation, rotation);
   // Bind the position buffer.
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
