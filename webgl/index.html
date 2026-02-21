@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>WebGL 2023 - 01 Hello, Triangle!</title>
+    <link rel="stylesheet" href="resources/css/ui-lightness/jquery-ui-1.8.16.custom.css">
 
     <style>
       html, head, body {
@@ -14,9 +15,13 @@
         background-color: #2a2a2a;
       }
 
+      .main-container {
+        display: flex;
+        gap: 30px;
+        align-items: flex-start;
+      }
+
       #demo-canvas {
-        padding-left: 200px;
-        padding-top:50px;
         width: 800px;
         height: 800px;
 
@@ -47,11 +52,11 @@
 
       .controls {
         display: flex;
+        flex-direction: column;
         gap: 16px;
-        align-items: center;
-        margin-bottom: 16px;
         color: #eee;
         font-family: monospace;
+        min-width: 300px;
       }
 
       .controls label {
@@ -62,16 +67,19 @@
     </style>
   </head>
   <body>
-    <div class="controls">
-    <div class = translations>
-      <div id="x"></div>
-      <div id="y"></div>
+    <div class="main-container">
+        <canvas id="demo-canvas" width="800px" height="800px">
+        <!-- This message shows up only if the Canvas element isn't supported -->
+        HTML5 canvas not supported in your browser! These demos will not work.
+      </canvas>
+      <div class="controls">
+        <div id="scaleX"></div>
+        <div id="scaleY"></div>
+        <div id="x"></div>
+        <div id="y"></div>
+        <div id="rotation"></div>
+      </div>
     </div>
-    </div>
-    <canvas id="demo-canvas" width="800px" height="800px">
-      <!-- This message shows up only if the Canvas element isn't supported -->
-      HTML5 canvas not supported in your browser! These demos will not work.
-    </canvas>
 
     <!--
       Doing a little error output in the HTML is nice when testing on mobile,
@@ -80,6 +88,11 @@
     <div id="error-box">
       <span class="error-box-title">Error messages, if any, go in here.</span>
     </div>
+    <script src="resources/jquery-1.7.1.min.js"></script>
+    <script src="resources/jquery-ui-1.8.16.custom.min.js"></script>
+    <script src="resources/jquery.mousecapture.js"></script>
+    <script src="resources/jquery.gman.ui.js"></script>
+    <script src="resources/jquery-gman-circle.js"></script>
     <script src="resources/webgl-lessons-ui.js"></script>
     <script type="module" src="main.js"></script>
   </body>

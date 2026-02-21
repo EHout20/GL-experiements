@@ -4,19 +4,24 @@ attribute vec2 a_position;
 uniform vec2 u_resolution;
 uniform vec2 u_translation;
 uniform vec2 u_rotation;
+uniform vec2 u_scale;
 
 void main() {
-  // Rotate the position with a 2x2 rotation matrix.
+  // Scale the position
+  vec2 scaledPosition = a_position * u_scale;
+
+  // Rotate the position with a 2x2 rotation matrix
   // u_rotation = vec2(sin(theta), cos(theta))
   mat2 rotationMatrix = mat2(
     u_rotation.y, u_rotation.x,
    -u_rotation.x, u_rotation.y
   );
-  vec2 rotatedPosition = rotationMatrix * a_position;
+  vec2 rotatedPosition = rotationMatrix * scaledPosition;
 
   // Add in the translation
   vec2 position = rotatedPosition + u_translation;
 
+  // Convert to clip space
   vec2 zeroToOne = position / u_resolution;
   vec2 zeroToTwo = zeroToOne * 2.0;
   vec2 clipSpace = zeroToTwo - 1.0;
@@ -26,8 +31,3 @@ void main() {
 `;
 
 export default vertexShaderSource;
-
-
-
-
-

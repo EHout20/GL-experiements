@@ -1,11 +1,13 @@
-import vertexShaderSource from './shaders/vertex-translation.js';
+// import vertexShaderSource from './shaders/vertex-translation.js';
+// import vertexShaderSource from './shaders/vertex-rotation.js';
+import vertexShaderSource from './shaders/vertex-scale-rotation.js';
 // import vertexShaderSource from './shaders/vertex-clipspace.js'; // normalized coordinates
 import fragmentShaderSource from './shaders/fragment-shader.js';
 
 var canvas = document.getElementById('demo-canvas');
 var gl = canvas ? canvas.getContext('webgl') : null;
 
-var translation = [0, 0];
+var translation = [200, 150];
 
 if (!gl) {
   console.error('WebGL not available on this device/browser.');
@@ -22,8 +24,12 @@ var program = createProgram(gl, vertexShader, fragmentShader);
 var positionAttributeLocation = gl.getAttribLocation(program, "a_position");
 
 var rotationLocation = gl.getUniformLocation(program, "u_rotation");
+var scaleLocation = gl.getUniformLocation(program, "u_scale");
+var rotationCenterLocation = gl.getUniformLocation(program, "u_rotationCenter");
 
 var rotation = [0, 1];
+var scale = [1, 1];
+var rotationCenter = [50, 75];  // Center of the F shape (approximate)
 
 var positionBuffer = gl.createBuffer();
 
@@ -64,9 +70,47 @@ function createProgram(gl, vertexShader, fragmentShader) {
   gl.deleteProgram(program);
 }
 
-  // setup UI for rotation
-  webglLessonsUI.setupSlider("#x", {value: translation[0], slide: updatePosition(0), max: gl.canvas.width });
-  webglLessonsUI.setupSlider("#y", {value: translation[1], slide: updatePosition(1), max: gl.canvas.height});
+function updatePosition(index) {
+  return function(event, ui) {
+    translation[index] = ui.value;
+    drawScene();
+  };
+}
+
+function updateScale(index) {
+  return function(event, ui) {
+    scale[index] = ui.value;
+    drawScene();
+  };
+}
+
+function updateAngle(event, ui) {
+  var angleInDegrees = 360 - ui.value;
+  var angleInRadians = angleInDegrees * Math.PI / 180;
+  rotation[0] = Math.sin(angleInRadians);
+  rotation[1] = Math.cos(angleInRadians);
+  drawScene();
+}
+
+function setupSliders() {
+  if (typeof webglLessonsUI === 'undefined') {
+    console.error('webglLessonsUI not loaded.');
+    return;
+  }
+  webglLessonsUI.setupSlider("#scaleX", {value: scale[0], slide: updateScale(0), min: -5, max: 5, step: 0.01, precision: 2});
+  webglLessonsUI.setupSlider("#scaleY", {value: scale[1], slide: updateScale(1), min: -5, max: 5, step: 0.01, precision: 2});
+
+  webglLessonsUI.setupSlider("#x", {
+    value: translation[0],
+    slide: updatePosition(0),
+    max: gl.canvas.width
+  });
+  webglLessonsUI.setupSlider("#y", {
+    value: translation[1],
+    slide: updatePosition(1),
+    max: gl.canvas.height
+  });
+  
   $("#rotation").gmanUnitCircle({
     width: 200,
     height: 200,
@@ -76,27 +120,6 @@ function createProgram(gl, vertexShader, fragmentShader) {
       rotation[1] = u.y;
       drawScene();
     }
-  });
-function updatePosition(index) {
-  return function(event, ui) {
-    translation[index] = ui.value;
-    drawScene();
-  };
-}
-
-function setupSliders() {
-  if (typeof webglLessonsUI === 'undefined') {
-    console.error('webglLessonsUI not loaded.');
-    return;
-  }
-
-  webglLessonsUI.setupSlider("#x", {
-    slide: updatePosition(0),
-    max: gl.canvas.width
-  });
-  webglLessonsUI.setupSlider("#y", {
-    slide: updatePosition(1),
-    max: gl.canvas.height
   });
 }
 function drawScene() {
@@ -115,6 +138,10 @@ function drawScene() {
   gl.enableVertexAttribArray(positionAttributeLocation);
   // Set the rotation.
   gl.uniform2fv(rotationLocation, rotation);
+  // Set the scale.
+  gl.uniform2fv(scaleLocation, scale);
+  // Set the rotation center.
+  gl.uniform2fv(rotationCenterLocation, rotationCenter);
   // Bind the position buffer.
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 

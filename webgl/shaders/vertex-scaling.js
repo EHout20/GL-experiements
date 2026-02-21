@@ -4,6 +4,7 @@ attribute vec2 a_position;
 uniform vec2 u_resolution;
 uniform vec2 u_translation;
 uniform vec2 u_rotation;
+uniform vec2 u_scale;
 
 void main() {
   // Rotate the position with a 2x2 rotation matrix.
@@ -12,6 +13,8 @@ void main() {
     u_rotation.y, u_rotation.x,
    -u_rotation.x, u_rotation.y
   );
+  //scaling hte x and the y
+  a_position = vec2(a_position.x * u_scale.x, a_position.y * u_scale.y);
   vec2 rotatedPosition = rotationMatrix * a_position;
 
   // Add in the translation
