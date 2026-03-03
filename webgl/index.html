@@ -21,6 +21,11 @@
         align-items: flex-start;
       }
 
+      .canvas-wrapper {
+        position: relative;
+        display: inline-block;
+      }
+
       #demo-canvas {
         width: 800px;
         height: 800px;
@@ -33,6 +38,18 @@
 
         /* Help to illustrate the rasterizer's job: when artificially lowering resolution, show pixelated image */
         image-rendering: crisp-edges;
+      }
+
+      .origin-dot {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: red;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
       }
 
       /** CSS to make a nice little error box output for debugging (nice if you can't use devtools, e.g. mobile)  */
@@ -68,10 +85,13 @@
   </head>
   <body>
     <div class="main-container">
+      <div class="canvas-wrapper">
         <canvas id="demo-canvas" width="800px" height="800px">
         <!-- This message shows up only if the Canvas element isn't supported -->
         HTML5 canvas not supported in your browser! These demos will not work.
       </canvas>
+        <div class="origin-dot" aria-hidden="true"></div>
+      </div>
       <div class="controls">
         <div id="scaleX"></div>
         <div id="scaleY"></div>

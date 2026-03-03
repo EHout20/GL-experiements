@@ -5,21 +5,45 @@ uniform vec2 u_resolution;
 uniform vec2 u_translation;
 uniform vec2 u_rotation;
 uniform vec2 u_scale;
+uniform vec2 u_rotationCenter;
 
 void main() {
-  // Scale the position
-  vec2 scaledPosition = a_position * u_scale;
-
-  // Rotate the position with a 2x2 rotation matrix
-  // u_rotation = vec2(sin(theta), cos(theta))
-  mat2 rotationMatrix = mat2(
-    u_rotation.y, u_rotation.x,
-   -u_rotation.x, u_rotation.y
+  // Build generalized 2D rigid transform in homogeneous coordinates:
+  // T(translation) * T(rotationCenter) * R * T(-rotationCenter) * S
+  mat3 scaleMatrix = mat3(
+    u_scale.x, 0.0, 0.0,
+    0.0, u_scale.y, 0.0,
+    0.0, 0.0, 1.0
   );
-  vec2 rotatedPosition = rotationMatrix * scaledPosition;
 
-  // Add in the translation
-  vec2 position = rotatedPosition + u_translation;
+  // u_rotation = vec2(sin(theta), cos(theta))
+  mat3 rotationMatrix = mat3(
+    u_rotation.y, u_rotation.x, 0.0,
+   -u_rotation.x, u_rotation.y, 0.0,
+    0.0,          0.0,          1.0
+  );
+
+  mat3 toCenter = mat3(
+    1.0, 0.0, 0.0,
+    0.0, 1.0, 0.0,
+    u_rotationCenter.x, u_rotationCenter.y, 1.0
+  );
+
+  mat3 fromCenter = mat3(
+    1.0, 0.0, 0.0,
+    0.0, 1.0, 0.0,
+   -u_rotationCenter.x, -u_rotationCenter.y, 1.0
+  );
+
+  mat3 translationMatrix = mat3(
+    1.0, 0.0, 0.0,
+    0.0, 1.0, 0.0,
+    u_translation.x, u_translation.y, 1.0
+  );
+
+  vec3 worldPosition =
+      translationMatrix * toCenter * rotationMatrix * fromCenter * scaleMatrix * vec3(a_position, 1.0);
+  vec2 position = worldPosition.xy;
 
   // Convert to clip space
   vec2 zeroToOne = position / u_resolution;

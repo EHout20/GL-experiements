@@ -5,6 +5,7 @@ import vertexShaderSource from './shaders/vertex-scale-rotation.js';
 import fragmentShaderSource from './shaders/fragment-shader.js';
 
 var canvas = document.getElementById('demo-canvas');
+var originDotElement = document.querySelector('.origin-dot');
 var gl = canvas ? canvas.getContext('webgl') : null;
 
 var translation = [200, 150];
@@ -41,6 +42,18 @@ gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 canvas.width = canvas.clientWidth;
 canvas.height = canvas.clientHeight;
 gl.viewport(0, 0, canvas.width, canvas.height);
+
+var originDotPosition = [canvas.width * 0.5, canvas.height * 0.5];
+
+function syncOriginDotPosition() {
+  if (!originDotElement) {
+    return;
+  }
+  originDotElement.style.left = originDotPosition[0] + 'px';
+  originDotElement.style.top = originDotPosition[1] + 'px';
+}
+
+syncOriginDotPosition();
 
 //boilerplate code for creating shaders and programs 
 function createShader(gl, type, source) {
