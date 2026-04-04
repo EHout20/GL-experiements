@@ -1,0 +1,10 @@
+# LaTeX build outputs (keep presentation.tex; regenerate PDF locally)
+*.aux
+*.log
+*.nav
+*.out
+*.pdf
+*.snm
+*.synctex.gz
+*.toc
+*.vrb

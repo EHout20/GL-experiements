@@ -1,0 +1,169 @@
+% GL Experiments — WebGL learning presentation
+% Build (from this folder): pdflatex presentation.tex
+% From repo root: pdflatex presentation/presentation.tex
+% (run pdflatex twice if TOC page numbers look wrong)
+
+\documentclass[aspectratio=169]{beamer}
+
+\usetheme{Madrid}
+\usecolortheme{default}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\lstdefinestyle{glsl}{
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{blue!70!black},
+  commentstyle=\color{gray},
+  stringstyle=\color{teal},
+  breaklines=true,
+  showstringspaces=false,
+  frame=single,
+  framerule=0.2pt,
+  columns=fullflexible,
+}
+\lstset{style=glsl}
+
+\title{GL Experiments}
+\subtitle{WebGL shaders, 2D transforms, and the raster pipeline}
+\author{Jacob}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Outline}
+  \tableofcontents
+\end{frame}
+
+\section{Why WebGL}
+
+\begin{frame}{What this project is}
+  \begin{itemize}
+    \item Hands-on repo for \textbf{OpenGL / WebGL} basics: buffers, shaders, 2D math.
+    \item Two tracks: \textbf{browser WebGL} (\texttt{webgl/}) and a small \textbf{C++ OpenGL} app (WIP).
+    \item Goal: connect \textbf{pixel-space geometry} to \textbf{GPU drawing} with minimal magic.
+  \end{itemize}
+  \vfill
+  \begin{block}{Primary tutorial series}
+    \href{https://webglfundamentals.org/}{WebGL Fundamentals} — translation, rotation, scale, matrices, then 3D.
+  \end{block}
+\end{frame}
+
+\section{The GPU pipeline}
+
+\begin{frame}{Vertex shader vs.\ fragment shader}
+  \begin{description}
+    \item[Vertex shader] Runs once \textbf{per vertex}. Must write \texttt{gl\_Position} (clip space). Can output \texttt{varying}s to interpolate.
+    \item[Fragment shader] Runs once \textbf{per pixel} (fragment) inside drawn triangles. Writes color (\texttt{gl\_FragColor} in WebGL1 GLSL).
+  \end{description}
+  \vfill
+  \centering
+  \small
+  CPU: buffer data $\rightarrow$ \texttt{drawArrays} $\rightarrow$ GPU: vertices $\rightarrow$ rasterize $\rightarrow$ fragments
+\end{frame}
+
+\begin{frame}{Attributes and uniforms}
+  \begin{description}
+    \item[Attribute] Per-vertex input (e.g.\ \texttt{a\_position} from a VBO). Location bound with \texttt{vertexAttribPointer}.
+    \item[Uniform] Same value for the whole draw call (e.g.\ resolution, translation, rotation).
+  \end{description}
+  \vfill
+  \begin{block}{In this repo}
+    The ``F'' shape is a single \texttt{Float32Array} of 2D positions; sliders update uniforms and \texttt{drawScene()} redraws.
+  \end{block}
+\end{frame}
+
+\section{Our 2D vertex shader}
+
+\begin{frame}{Transform order (concept)}
+  We compose a 2D rigid transform using \textbf{homogeneous coordinates} (\texttt{mat3}, \texttt{vec3(x,y,1)}):
+  \[
+    T_{\text{trans}} \cdot T_{\text{center}} \cdot R \cdot T_{-\text{center}} \cdot S
+  \]
+  \begin{itemize}
+    \item \textbf{S} — scale around local origin
+    \item \textbf{R} — rotate around \texttt{u\_rotationCenter}
+    \item \textbf{T} — translate in pixel space
+  \end{itemize}
+  \vfill
+  \small
+  Same building blocks as \href{https://webglfundamentals.org/webgl/lessons/webgl-2d-matrices.html}{WebGL Fundamentals: 2D matrices}.
+\end{frame}
+
+\begin{frame}[fragile]{Vertex shader (excerpt): matrices}
+\begin{lstlisting}[language=C]
+// u_rotation = vec2(sin(theta), cos(theta))
+mat3 rotationMatrix = mat3(
+  u_rotation.y, u_rotation.x, 0.0,
+ -u_rotation.x, u_rotation.y, 0.0,
+  0.0,          0.0,          1.0
+);
+vec3 worldPosition =
+  translationMatrix * toCenter * rotationMatrix
+  * fromCenter * scaleMatrix * vec3(a_position, 1.0);
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Pixel space to clip space}
+  After world position in \textbf{pixels} (origin top-left style), map to clip space $[-1,1]$:
+\begin{lstlisting}[language=C]
+vec2 zeroToOne = position / u_resolution;
+vec2 zeroToTwo = zeroToOne * 2.0;
+vec2 clipSpace = zeroToTwo - 1.0;
+gl_Position = vec4(clipSpace * vec2(1.0, -1.0), 0.0, 1.0);
+\end{lstlisting}
+  \texttt{vec2(1,-1)} flips Y: canvas Y grows downward; clip space Y grows upward.
+  \vfill
+  \small
+  See the resolution / clip-space discussion in the WebGL Fundamentals 2D articles.
+\end{frame}
+
+\begin{frame}[fragile]{Fragment shader (current)}
+  Solid color for every pixel inside the triangles:
+\begin{lstlisting}[language=C]
+precision mediump float;
+void main() {
+  gl_FragColor = vec4(1.0, 0.0, 0.5, 1.0);
+}
+\end{lstlisting}
+  Next step in many tutorials: pass \texttt{varying} colors or texture coordinates from the vertex shader.
+\end{frame}
+
+\section{Running the demo}
+
+\begin{frame}{Local WebGL demo}
+  \begin{enumerate}
+    \item \texttt{cd webgl}
+    \item \texttt{python3 -m http.server 8080}
+    \item Open \texttt{http://localhost:8080/}
+  \end{enumerate}
+  \vfill
+  \begin{itemize}
+    \item Swap \texttt{vertex-*.js} imports in \texttt{main.js} to try translation-only, rotation, clip-space variants, etc.
+    \item Sliders: translation, scale, rotation (unit circle UI).
+  \end{itemize}
+\end{frame}
+
+\section{References}
+
+\begin{frame}{Useful links}
+  \begin{itemize}
+    \item \href{https://webglfundamentals.org/}{WebGL Fundamentals} — main tutorial path.
+    \item \href{https://learnopengl.com/}{Learn OpenGL} — often used for desktop GL; concepts overlap.
+    \item Notion notes (project): add your workspace link here if you want it in the PDF.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{}
+  \centering
+  \Large Questions?
+\end{frame}
+
+\end{document}
